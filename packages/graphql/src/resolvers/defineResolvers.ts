@@ -33,6 +33,6 @@ import { AnyResolver } from "./createResolver.js";
  * ```
  */
 
-export function defineResolvers<T extends AnyResolver>(...resolvers: (T | T[])[]): T[] {
-  return resolvers.flat() as T[];
+export function defineResolvers(...resolvers: (AnyResolver | AnyResolver[])[]): AnyResolver[] {
+  return resolvers.flat();
 }

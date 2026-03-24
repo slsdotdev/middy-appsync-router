@@ -1,24 +1,21 @@
-import type {
-  AppSyncResolverEvent,
-  AppSyncResolverHandler,
-  AppSyncBatchResolverHandler,
-  Context,
-} from "aws-lambda";
-import { AnyResolver, ResolveHandler } from "../resolvers/index.js";
+import type { AppSyncResolverEvent, AppSyncResolverHandler, Context } from "aws-lambda";
+import { AnyResolver } from "../resolvers/index.js";
 import { createRouterRegistry } from "./registry.js";
 import { isValidGraphQLEvent } from "../utils/isValidGraphQLEvent.js";
 import { isBatchResolver } from "../resolvers/createResolver.js";
 
 export interface GraphQLRouterParams {
   resolvers: AnyResolver[];
-  fallbackResolver?: ResolveHandler<unknown, unknown, unknown>;
+  fallbackResolver?: Extract<AnyResolver, { batch?: false }>["handler"];
 }
 
-export type AppSyncGraphQLHandler<TSource = unknown, TArgs = unknown, TResult = unknown> =
-  | AppSyncResolverHandler<TArgs, TSource, TResult>
-  | AppSyncBatchResolverHandler<TArgs, TSource, TResult>;
+export type AppSyncGraphQLHandler<
+  TArgs = unknown,
+  TSource extends Record<string, unknown> = Record<string, unknown>,
+  TResult = unknown,
+> = AppSyncResolverHandler<TArgs, TSource, TResult>;
 
-export type AppSyncHandlerEvent<TSource, TArgs> =
+export type AppSyncHandlerEvent<TArgs, TSource> =
   | AppSyncResolverEvent<TArgs, TSource>
   | AppSyncResolverEvent<TArgs, TSource>[];
 
@@ -30,8 +27,8 @@ export function appSyncGraphQLRouter(params: GraphQLRouterParams): AppSyncGraphQ
     registry.register(resolver);
   }
 
-  return async function handler<TSource, TArgs>(
-    event: AppSyncHandlerEvent<TSource, TArgs>,
+  return async function handler<TArgs, TSource>(
+    event: AppSyncHandlerEvent<TArgs, TSource>,
     context: Context
   ) {
     if (Array.isArray(event)) {
@@ -45,7 +42,7 @@ export function appSyncGraphQLRouter(params: GraphQLRouterParams): AppSyncGraphQ
       const resolver = registry.get(info.parentTypeName, info.fieldName);
 
       if (!resolver || !isBatchResolver(resolver)) {
-        return fallbackResolver(event[0], context);
+        return event.map((ev) => fallbackResolver(ev, context));
       }
 
       return resolver.handler(event, context);
