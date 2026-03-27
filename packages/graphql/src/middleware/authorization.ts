@@ -1,20 +1,6 @@
 import { MiddlewareObj } from "@middy/core";
-import {
-  AnyAppSyncResolverLikeEvent,
-  AnyIdentity,
-  DefinitionTypename,
-  FieldArgs,
-  FieldResult,
-  FieldSource,
-  isCognito,
-  isIAM,
-  isLambda,
-  isOIDC,
-  isValidResolverEvent,
-  ObjectFieldName,
-} from "../utils/index.js";
-import { ResolverEvent } from "../utils/event.js";
-import { Context } from "aws-lambda";
+import { AnyAppSyncResolverLikeEvent, isValidResolverEvent } from "../utils/index.js";
+import { isCognito, isIAM, isLambda, isOIDC } from "../utils/auth.js";
 
 export function allowCognitoIdentity<
   TEvent extends AnyAppSyncResolverLikeEvent,
@@ -92,44 +78,44 @@ export function allowOIDCIdentity<
   };
 }
 
-export function withAuthorizer<
-  TTypeName extends DefinitionTypename,
-  TFieldName extends ObjectFieldName<TTypeName>,
-  TSource extends FieldSource<TTypeName, TFieldName>,
-  TArgs extends FieldArgs<TTypeName, TFieldName>,
-  TResult extends FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AnyIdentity,
->(
-  authorizer: (identity: AnyIdentity) => boolean | TIdentity
-): MiddlewareObj<
-  ResolverEvent<TTypeName, TFieldName, TSource, TArgs, TIdentity>,
-  TResult,
-  Error,
-  Context
-> {
-  return {
-    before(request) {
-      if (Array.isArray(request.event)) {
-        for (const [i, event] of request.event.entries()) {
-          const result = authorizer(event.identity);
+// export function withAuthorizer<
+//   TTypeName extends DefinitionTypename,
+//   TFieldName extends ObjectFieldName<TTypeName>,
+//   TSource extends FieldSource<TTypeName, TFieldName>,
+//   TArgs extends FieldArgs<TTypeName, TFieldName>,
+//   TResult extends FieldResult<TTypeName, TFieldName>,
+//   TIdentity extends AppSyncIdentity,
+// >(
+//   authorizer: (identity: AnyIdentity) => boolean | TIdentity
+// ): MiddlewareObj<
+//   ResolverEvent<TTypeName, TFieldName, TSource, TArgs, TIdentity>,
+//   TResult,
+//   Error,
+//   Context
+// > {
+//   return {
+//     before(request) {
+//       if (Array.isArray(request.event)) {
+//         for (const [i, event] of request.event.entries()) {
+//           const result = authorizer(event.identity);
 
-          if (typeof result === "boolean") {
-            if (!result) throw new Error("Unauthorized");
-            continue;
-          }
+//           if (typeof result === "boolean") {
+//             if (!result) throw new Error("Unauthorized");
+//             continue;
+//           }
 
-          request.event[i].identity = result;
-        }
-      }
+//           request.event[i].identity = result;
+//         }
+//       }
 
-      const result = authorizer(request.event.identity);
+//       const result = authorizer(request.event.identity);
 
-      if (typeof result === "boolean") {
-        if (!result) throw new Error("Unauthorized");
-        return;
-      }
+//       if (typeof result === "boolean") {
+//         if (!result) throw new Error("Unauthorized");
+//         return;
+//       }
 
-      request.event.identity = result;
-    },
-  };
-}
+//       request.event.identity = result;
+//     },
+//   };
+// }

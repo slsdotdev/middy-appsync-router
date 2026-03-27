@@ -3,16 +3,13 @@ import {
   createQueryResolver,
   createResolver,
   defineResolvers,
-  isCognito,
 } from "@middy-appsync/graphql";
 
 const userName = createResolver({
   typeName: "User",
   fieldName: "name",
-  // batch: true,
-  authorize: isCognito,
   resolve: (event) => {
-    return event.identity.username;
+    return event.source.name;
   },
 });
 

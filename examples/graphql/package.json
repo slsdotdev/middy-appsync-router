@@ -24,7 +24,8 @@
     "build": "tsc",
     "test": "vitest run",
     "lint": "eslint src --ext .ts",
-    "dev": "vitest watch"
+    "dev": "vitest watch",
+    "codegen": "middy-appsync generate"
   },
   "dependencies": {
     "@middy/core": "^7.2.1",

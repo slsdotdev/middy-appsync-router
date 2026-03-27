@@ -24,11 +24,6 @@ export {
 } from "./middleware/index.js";
 
 export {
-  isValidResolverEvent,
-  isCognito,
-  isIAM,
-  isLambda,
-  isOIDC,
   type SchemaDefinition,
   type DefinitionObject,
   type DefinitionTypename,
@@ -42,6 +37,5 @@ export {
   type AnyAppSyncBatchResolverEvent,
   type AnyAppSyncResolverEvent,
   type AnyAppSyncResolverInputEvent,
-  type AnyIdentity,
   type TypedAppSyncResolverEvent,
 } from "./utils/index.js";

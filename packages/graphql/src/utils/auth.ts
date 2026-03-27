@@ -55,3 +55,9 @@ export function isLambda(identity: AppSyncIdentity): identity is AppSyncIdentity
     isRecord(identity.resolverContext)
   );
 }
+
+export function rule<TIdentity extends AppSyncIdentity>(
+  predicate: (identity: TIdentity) => identity is TIdentity
+) {
+  return predicate;
+}

@@ -3,5 +3,5 @@ export {
   allowIAMIdentity,
   allowLambdaIdentity,
   allowOIDCIdentity,
-  withAuthorizer,
+  // withAuthorizer,
 } from "./authorization.js";

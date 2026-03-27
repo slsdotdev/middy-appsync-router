@@ -19,5 +19,3 @@ export {
   type AnyAppSyncResolverInputEvent,
   type TypedAppSyncResolverEvent,
 } from "./event.js";
-export { isCognito, isIAM, isLambda, isOIDC, type AnyIdentity } from "./auth.js";
-export { isDefined, isRecord, isString, hasProperty, isNumber } from "./typeGuards.js";
