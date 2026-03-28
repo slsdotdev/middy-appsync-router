@@ -1,27 +1,24 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SchemaDefinition {}
+import { Definition } from "./config.js";
 
 export type DefinitionObject = Record<string, FieldProps>;
 
-export type DefinitionTypename = keyof SchemaDefinition extends never
-  ? string
-  : keyof SchemaDefinition;
+export type DefinitionTypename = keyof Definition extends never ? string : keyof Definition;
 
-export type ObjectFieldName<T extends DefinitionTypename> = keyof SchemaDefinition extends never
+export type ObjectFieldName<T extends DefinitionTypename> = keyof Definition extends never
   ? string
-  : T extends keyof SchemaDefinition
-    ? keyof SchemaDefinition[T]
+  : T extends keyof Definition
+    ? keyof Definition[T]
     : never;
 
 export type FieldArgs<
   T extends DefinitionTypename,
   F extends ObjectFieldName<T>,
-> = keyof SchemaDefinition extends never
+> = keyof Definition extends never
   ? Record<string, unknown>
-  : T extends keyof SchemaDefinition
-    ? keyof SchemaDefinition[T] extends infer Fn
+  : T extends keyof Definition
+    ? keyof Definition[T] extends infer Fn
       ? Fn extends F
-        ? SchemaDefinition[T][Fn] extends { args: infer A }
+        ? Definition[T][Fn] extends { args: infer A }
           ? A
           : never
         : never
@@ -31,12 +28,12 @@ export type FieldArgs<
 export type FieldResult<
   T extends DefinitionTypename,
   F extends ObjectFieldName<T>,
-> = keyof SchemaDefinition extends never
+> = keyof Definition extends never
   ? unknown
-  : T extends keyof SchemaDefinition
-    ? keyof SchemaDefinition[T] extends infer Fn
+  : T extends keyof Definition
+    ? keyof Definition[T] extends infer Fn
       ? Fn extends F
-        ? SchemaDefinition[T][Fn] extends { result: infer R }
+        ? Definition[T][Fn] extends { result: infer R }
           ? R
           : never
         : never
@@ -46,12 +43,12 @@ export type FieldResult<
 export type FieldSource<
   T extends DefinitionTypename,
   F extends ObjectFieldName<T>,
-> = keyof SchemaDefinition extends never
+> = keyof Definition extends never
   ? Record<string, unknown> | null
-  : T extends keyof SchemaDefinition
-    ? keyof SchemaDefinition[T] extends infer Fn
+  : T extends keyof Definition
+    ? keyof Definition[T] extends infer Fn
       ? Fn extends F
-        ? SchemaDefinition[T][Fn] extends { source: infer S }
+        ? Definition[T][Fn] extends { source: infer S }
           ? S
           : never
         : never

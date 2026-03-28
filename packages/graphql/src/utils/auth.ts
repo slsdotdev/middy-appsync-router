@@ -5,9 +5,24 @@ import type {
   AppSyncIdentityLambda,
   AppSyncIdentityOIDC,
 } from "aws-lambda";
+import type { Authorization } from "./config.js";
 import { hasProperty, isDefined, isRecord, isString } from "./typeGuards.js";
 
-export type AnyIdentity = AppSyncIdentity | Record<string, unknown>;
+export type Identity = keyof Authorization extends never
+  ? AppSyncIdentity
+  : keyof Authorization extends infer K
+    ? K extends string
+      ? K extends "allow"
+        ? K extends keyof Authorization
+          ? Authorization[K] extends infer U
+            ? U extends AppSyncIdentity
+              ? U
+              : AppSyncIdentity
+            : AppSyncIdentity
+          : AppSyncIdentity
+        : AppSyncIdentity
+      : AppSyncIdentity
+    : AppSyncIdentity;
 
 export function isOIDC(identity: AppSyncIdentity): identity is AppSyncIdentityOIDC {
   return (

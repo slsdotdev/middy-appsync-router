@@ -1,3 +1,5 @@
+export { type Identity, isCognito, isIAM, isLambda, isOIDC, rule } from "./auth.js";
+export type { Definition, Authorization } from "./config.js";
 export type {
   DefinitionObject,
   DefinitionTypename,
@@ -7,9 +9,7 @@ export type {
   FieldSource,
   ValueType,
   FieldProps,
-  SchemaDefinition,
 } from "./definition.js";
-
 export {
   isValidResolverEvent,
   normalizeEvent,

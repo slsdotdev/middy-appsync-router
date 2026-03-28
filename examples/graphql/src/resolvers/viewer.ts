@@ -9,7 +9,7 @@ const userName = createResolver({
   typeName: "User",
   fieldName: "name",
   resolve: (event) => {
-    return event.source.name;
+    return event.identity.sub;
   },
 });
 

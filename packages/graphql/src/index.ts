@@ -1,4 +1,10 @@
 export {
+  allowCognitoIdentity,
+  allowIAMIdentity,
+  allowLambdaIdentity,
+  allowOIDCIdentity,
+} from "./middleware/index.js";
+export {
   createResolver,
   createQueryResolver,
   createMutationResolver,
@@ -13,18 +19,10 @@ export {
   type ResolverParams,
   type BatchResolveHandler,
 } from "./resolvers/index.js";
-
 export { appSyncGraphQLRouter, type GraphQLRouterParams } from "./router/index.js";
-
 export {
-  allowCognitoIdentity,
-  allowIAMIdentity,
-  allowLambdaIdentity,
-  allowOIDCIdentity,
-} from "./middleware/index.js";
-
-export {
-  type SchemaDefinition,
+  type Authorization,
+  type Definition,
   type DefinitionObject,
   type DefinitionTypename,
   type ObjectFieldName,

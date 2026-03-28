@@ -1,14 +1,15 @@
+import type { Context } from "aws-lambda";
 import middy, { MiddlewareObj, MiddyfiedHandler } from "@middy/core";
-import { AppSyncIdentity, Context } from "aws-lambda";
-import { hasProperty } from "../utils/typeGuards.js";
-import {
+import type { Identity } from "../utils/auth.js";
+import type {
   DefinitionTypename,
   FieldArgs,
   FieldResult,
   FieldSource,
   ObjectFieldName,
 } from "../utils/definition.js";
-import { ResolverEvent, TypedAppSyncResolverEvent } from "../utils/event.js";
+import type { ResolverEvent, TypedAppSyncResolverEvent } from "../utils/event.js";
+import { hasProperty } from "../utils/typeGuards.js";
 
 export type ResolveHandler<
   TTypeName extends DefinitionTypename,
@@ -16,7 +17,7 @@ export type ResolveHandler<
   TSource extends FieldSource<TTypeName, TFieldName>,
   TArgs extends FieldArgs<TTypeName, TFieldName>,
   TResult extends FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AppSyncIdentity,
+  TIdentity extends Identity,
 > = (
   event: TypedAppSyncResolverEvent<TTypeName, TFieldName, TSource, TArgs, TIdentity>,
   context: Context
@@ -28,7 +29,7 @@ export type BatchResolveHandler<
   TSource extends FieldSource<TTypeName, TFieldName>,
   TArgs extends FieldArgs<TTypeName, TFieldName>,
   TResult extends FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AppSyncIdentity,
+  TIdentity extends Identity,
 > = (
   events: TypedAppSyncResolverEvent<TTypeName, TFieldName, TSource, TArgs, TIdentity>[],
   context: Context
@@ -40,7 +41,7 @@ export interface Resolver<
   TSource extends FieldSource<TTypeName, TFieldName>,
   TArgs extends FieldArgs<TTypeName, TFieldName>,
   TResult extends FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AppSyncIdentity,
+  TIdentity extends Identity,
   TBatch extends boolean | undefined,
 > {
   typeName: TTypeName;
@@ -81,7 +82,7 @@ export interface ResolverParams<
   TSource extends FieldSource<TTypeName, TFieldName>,
   TArgs extends FieldArgs<TTypeName, TFieldName>,
   TResult extends FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AppSyncIdentity,
+  TIdentity extends Identity,
   TBatch extends boolean | undefined,
 > {
   /**
@@ -113,14 +114,14 @@ export interface ResolverParams<
   //  *   fieldName: "getUser",
   //  *   authorize: isCognito,
   //  *   resolve: (event) => {
-  //  *     // At this point, TypeScript knows that event.identity is of type AppSyncIdentityCognito
+  //  *     // At this point, TypeScript knows that event.identity is of type IdentityCognito
   //  *     const username = event.identity.username;
   //  *     // Fetch user by username and return
   //  *   },
   //  * });
   //  * ```
   //  */
-  // authorize?: (identity: AppSyncIdentity) => TIdentity;
+  // authorize?: (identity: Identity) => TIdentity;
   /**
    * The resolver function that will be called when this resolver is invoked. If `batch` is `true`, this should be a batch resolver function that accepts an array of events and returns an array of results. Otherwise, it should be a regular resolver function that accepts a single event and returns a single result.
    * @param event The resolver event containing arguments, identity, source, etc.
@@ -128,8 +129,8 @@ export interface ResolverParams<
    * @returns The result of the resolver function. If `batch` is `true`, this should be an array of results corresponding to the array of input events.
    */
   resolve: TBatch extends true
-    ? BatchResolveHandler<TTypeName, TFieldName, TSource, TArgs, TResult, NoInfer<TIdentity>>
-    : ResolveHandler<TTypeName, TFieldName, TSource, TArgs, TResult, NoInfer<TIdentity>>;
+    ? BatchResolveHandler<TTypeName, TFieldName, TSource, TArgs, TResult, TIdentity>
+    : ResolveHandler<TTypeName, TFieldName, TSource, TArgs, TResult, TIdentity>;
 }
 
 /**
@@ -159,7 +160,7 @@ export function createResolver<
   TSource extends FieldSource<TTypeName, TFieldName> = FieldSource<TTypeName, TFieldName>,
   TArgs extends FieldArgs<TTypeName, TFieldName> = FieldArgs<TTypeName, TFieldName>,
   TResult extends FieldResult<TTypeName, TFieldName> = FieldResult<TTypeName, TFieldName>,
-  TIdentity extends AppSyncIdentity = AppSyncIdentity,
+  TIdentity extends Identity = Identity,
   TBatch extends boolean | undefined = undefined,
 >(
   params: ResolverParams<TTypeName, TFieldName, TSource, TArgs, TResult, TIdentity, TBatch>
@@ -200,7 +201,7 @@ export function createQueryResolver<
   TSource extends FieldSource<"Query", TFieldName> = FieldSource<"Query", TFieldName>,
   TArgs extends FieldArgs<"Query", TFieldName> = FieldArgs<"Query", TFieldName>,
   TResult extends FieldResult<"Query", TFieldName> = FieldResult<"Query", TFieldName>,
-  TIdentity extends AppSyncIdentity = AppSyncIdentity,
+  TIdentity extends Identity = Identity,
   TBatch extends boolean | undefined = undefined,
 >(
   params: Omit<
@@ -219,7 +220,7 @@ export function createMutationResolver<
   TSource extends FieldSource<"Mutation", TFieldName> = FieldSource<"Mutation", TFieldName>,
   TArgs extends FieldArgs<"Mutation", TFieldName> = FieldArgs<"Mutation", TFieldName>,
   TResult extends FieldResult<"Mutation", TFieldName> = FieldResult<"Mutation", TFieldName>,
-  TIdentity extends AppSyncIdentity = AppSyncIdentity,
+  TIdentity extends Identity = Identity,
   TBatch extends boolean | undefined = undefined,
 >(
   params: Omit<
@@ -238,7 +239,7 @@ export function createSubscriptionResolver<
   TSource extends FieldSource<"Subscription", TFieldName> = FieldSource<"Subscription", TFieldName>,
   TArgs extends FieldArgs<"Subscription", TFieldName> = FieldArgs<"Subscription", TFieldName>,
   TResult extends FieldResult<"Subscription", TFieldName> = FieldResult<"Subscription", TFieldName>,
-  TIdentity extends AppSyncIdentity = AppSyncIdentity,
+  TIdentity extends Identity = Identity,
   TBatch extends boolean | undefined = undefined,
 >(
   params: Omit<
